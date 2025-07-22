@@ -25,20 +25,36 @@ const tags = computed<string[]>(() => {
   return [];
 });
 
+const [firstName] = '';
+const [lastName] = '';
+const [email] = '';
+
 const isApplying = ref(false);
 const appliedSuccessfully = ref(false);
 const apply = async () => {
+  console.log({ postingId: id, firstName: firstName, lastName: lastName, email: lastName });
   try {
     isApplying.value = true;
     await $fetch('/api/application', {
       method: 'POST',
-      body: { postingId: id },
+      body: { postingId: id, firstName: firstName, lastName: lastName, email: lastName },
     });
+    console.log({ postingId: id, firstName: firstName, lastName: lastName, email: lastName });
   } catch (e) {
     console.error('Error occured while applying', e);
   } finally {
     isApplying.value = false;
   }
+};
+
+const isModalOpen = ref(false);
+
+const open = () => {
+  isModalOpen.value = true;
+};
+
+const close = () => {
+  isModalOpen.value = false;
 };
 
 // Google Jobs JSON-LD injection
@@ -86,7 +102,7 @@ useJobPostingJsonld(posting);
                 <Icon name="teenyicons:tick-circle-solid" class="w-4 h-4" />
                 <span>Applied</span>
               </div>
-              <VInputButton class="w-full" @click="apply" :disabled="isApplying" v-else>
+              <VInputButton class="w-full" :disabled="isApplying" v-else>
                 Apply Today
                 <Icon class="fill-current ml-1" name="mdi:arrow-right" />
               </VInputButton>
@@ -133,10 +149,29 @@ useJobPostingJsonld(posting);
                 <Icon name="teenyicons:tick-circle-solid" class="w-4 h-4" />
                 <span>Applied</span>
               </div>
-              <VInputButton class="w-full" @click="apply" :disabled="isApplying" v-else>
-                Apply Today
-                <Icon class="fill-current ml-1" name="mdi:arrow-right" />
-              </VInputButton>
+              <Modal title="Apply">
+                <template #input="{ open }">
+                  <VInputButton class="w-full" :disabled="isApplying">
+                    Apply Today
+                    <Icon class="fill-current ml-1" name="mdi:arrow-right" />
+                  </VInputButton>
+                </template>
+                <template #content="{ close }">
+                  <div class="max-w-2xl mx-auto bg-white rounded-lg shadow-lg p-6">
+                    <form class="space-y-4">
+                      <VInputText placeholder="Enter your first name" label="First Name" v-model="firstName" />
+                      <VInputText placeholder="Enter your last name" label="Last Name" v-model="lastName" />
+                      <VInputText placeholder="Enter your email" label="Email" v-model="email" />
+
+                      <div class="pt-4">
+                        <VInputButton class="w-full" @click="apply" :disabled="isApplying">
+                          Submit Application
+                        </VInputButton>
+                      </div>
+                    </form>
+                  </div>
+                </template>
+              </Modal>
             </div>
           </div>
         </div>

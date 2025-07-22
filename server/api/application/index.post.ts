@@ -5,6 +5,8 @@ import { jobPostingsTable, postingApplicantsTable } from '~~/server/db/schema';
 
 export default defineEventHandler(async (event) => {
   const session = await authenticateRequest(event);
+  console.log(session.user, 'session.user');
+
   const body = await readValidatedBody(event, applicationCreateSchema.parse);
 
   if (IS_DEV) {
